@@ -91,9 +91,9 @@ class ThreatTextGenerator:
         decoded = self.tokenizer.decode(
             generated_ids,
             skip_special_tokens=True
-        )
+        ).strip()
 
-        return decoded.strip()
+        return decoded.split("\n\n")[0].strip()
 
     def generate_by_category(
         self,
@@ -120,19 +120,22 @@ class ThreatTextGenerator:
 
         import random
         cat = categories[category_key]
-        template = random.choice(cat["instruction_templates"])
-        _org   = org   or (random.choice(cat["orgs"])   if cat.get("orgs")   else "")
-        _topic = topic or (random.choice(cat["topics"]) if cat.get("topics") else "")
-
-        try:
-            instruction = template.format(org=_org, topic=_topic)
-        except KeyError:
-            instruction = template.replace("{org}", _org).replace("{topic}", _topic)
 
         results = []
         for i in range(n):
+            template = random.choice(cat["instruction_templates"])
+            _org   = org   or (random.choice(cat["orgs"])   if cat.get("orgs")   else "")
+            _topic = topic or (random.choice(cat["topics"]) if cat.get("topics") else "")
+
+            try:
+                instruction = template.format(org=_org, topic=_topic)
+            except KeyError:
+                instruction = template.replace("{org}", _org).replace("{topic}", _topic)
+
+            input_text = _org if _org else ""
+
             logger.info(f"Генерация {i+1}/{n}: {instruction[:60]}...")
-            text = self.generate(instruction)
+            text = self.generate(instruction, input_text=input_text)
             results.append({"instruction": instruction, "output": text})
 
         return results
