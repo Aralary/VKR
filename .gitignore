@@ -1,0 +1,7 @@
+venv
+input
+hc3_dataset
+data
+__pycache__
+features_cache_*
+detector_*

@@ -1,2 +1,2 @@
-# VKR
-Project for work with synthetic text 
+# AI_text_Detector
+Распознаватель синтетического текста
